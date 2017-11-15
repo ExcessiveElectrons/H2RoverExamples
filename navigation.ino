@@ -72,7 +72,7 @@ void forward_heading() {
 void turn_around()
 {
   int16_t imu_readings2[3];
-  
+  byte dutycycle =255;
   Imu_obj.getXYZ(imu_readings2);
   Red.motorBackward(255);
   delay(1000);
@@ -83,7 +83,7 @@ void turn_around()
   //turn left 180 degrees
   do{
     //Serial.println("in loop");
-    Red.motorLeft(255);
+    Red.motorLeft(dutycycle);
     Imu_obj.getXYZ(imu_readings2);
     if(imu_readings2[0] < 180) {
       imu_readings2[0] = imu_readings2[0] + 360;
@@ -92,7 +92,12 @@ void turn_around()
     Serial.print(imu_readings1[0]);
     Serial.print(" ~~ X2 = ");
     Serial.println(imu_readings2[0]);
+    if(!(imu_readings2[0] + 160 > imu_readings1[0]))
+    {
+      dutycycle=190+3*((imu_readings2[0] + 180) - imu_readings1[0]);
+    }//lets see if this tones down the sloppyness of the turn around behavior. Can't remember what the deadband on the motors are though. Not tested
   } while(imu_readings2[0] + 180 > imu_readings1[0]);
+  
 }
 
 void stopRed() {
